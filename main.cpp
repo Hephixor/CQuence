@@ -22,20 +22,15 @@ int main(){
   qubits.push_back(q5);
 
 
-  //verification
-  if(qubits.size()>16){
-    cerr << "maximum size 16 qubits" << endl;
-    return 1;
-  }
+    identity_matrix<double> mi (2);
+    q0.ops.push_back(mi);
+    q0.ops.push_back(mi);
+    q1.ops.push_back(mi);
+    q2.ops.push_back(mi);
+    q3.ops.push_back(mi);
+    q4.ops.push_back(mi);
+    q5.ops.push_back(mi);
 
-  //diplay
-  int i = 0;
-  for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
-      cout << "|q" << i << "> = " << it->ket0 << "|0> + " << it->ket1 << "|1> :: " << measureQubit(*it) << endl;
-      i++;
-  }
-
-cout << "=================================" << endl;
     // matrix<double> gnot (2, 2);
     // gnot(0,0)=0;
     // gnot(0,1)=1;
@@ -51,15 +46,15 @@ cout << "=================================" << endl;
     //  }
     //  cout << endl;
 
-     cout << "q5 as matrix : " << endl;
-     matrix<complex<double> > mq = qubitAsHorizontalMatrix(q5);
-         for (unsigned i = 0; i < mq.size1 (); ++ i){
-           cout << "" << endl;
-          for (unsigned j = 0; j < mq.size2 (); ++ j){
-            cout << mq(i,j) << " ";
-           }
-          }
-      cout << endl;
+     // cout << "q5 as matrix : " << endl;
+     // matrix<complex<double> > mq = qubitAsHorizontalMatrix(q5);
+     //     for (unsigned i = 0; i < mq.size1 (); ++ i){
+     //       cout << "" << endl;
+     //      for (unsigned j = 0; j < mq.size2 (); ++ j){
+     //        cout << mq(i,j) << " ";
+     //       }
+     //      }
+     // cout << endl;
       //
       // identity_matrix<double> mi (2);
       //  matrix<complex<double> > mqi (1,2);
@@ -71,10 +66,43 @@ cout << "=================================" << endl;
       //           cout << mqi(i,j) << " ";
       //          }
       //   }
-        cout << endl;
-
+      //  cout << endl;
+        run(qubits);
 
 }
+
+void run(list<qubit> qubits){
+  //verification
+  if(qubits.size()>16){
+    cerr << "maximum size 16 qubits" << endl;
+    }
+
+  checkOpSize(qubits);
+
+
+  //diplay
+  int i = 0;
+  for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
+      cout << "|q" << i << "> = " << it->ket0 << "|0> + " << it->ket1 << "|1> :: " << measureQubit(*it) << endl;
+      i++;
+  }
+
+cout << "=================================" << endl;
+
+}
+
+bool checkOpSize(list<qubit> qubits){
+  qubit q = qubits.front();
+  int opSize = q.ops.size();
+
+  // for (std::list<matrix<double> >::iterator it=q.ops.begin(); it != q.ops.end(); ++it){
+  //     cout << it.size() << endl;
+  // }
+
+
+  cout << "q ops :: " << q.ops.front() << " |   opsize :: " << opSize << endl;
+
+ }
 
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){
   matrix<complex<double> > mq (1,2);

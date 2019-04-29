@@ -19,8 +19,13 @@ int matrix[2][2];
 struct qubit {
   complex<double> ket0;
   complex<double> ket1;
+  list<matrix<double> > ops;
 };
 
+
+void run(list<qubit>);
+void addOp(qubit,identity_matrix<double>);
+bool checkOpSize(list<qubit>);
 string measureQubit(qubit);
 qubit qubitFactory(complex<double>, complex<double>);
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit);
