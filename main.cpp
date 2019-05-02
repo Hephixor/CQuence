@@ -14,14 +14,6 @@ int main(){
 
   std::list<qubit> qubits;
 
-  qubits.push_back(q0);
-  qubits.push_back(q1);
-  qubits.push_back(q2);
-  qubits.push_back(q3);
-  qubits.push_back(q4);
-  qubits.push_back(q5);
-
-
     identity_matrix<double> mi (2);
     q0.ops.push_back(mi);
     q0.ops.push_back(mi);
@@ -30,6 +22,13 @@ int main(){
     q3.ops.push_back(mi);
     q4.ops.push_back(mi);
     q5.ops.push_back(mi);
+
+    qubits.push_back(q0);
+    qubits.push_back(q1);
+    qubits.push_back(q2);
+    qubits.push_back(q3);
+    qubits.push_back(q4);
+    qubits.push_back(q5);
 
     // matrix<double> gnot (2, 2);
     // gnot(0,0)=0;
@@ -79,28 +78,29 @@ void run(list<qubit> qubits){
 
   checkOpSize(qubits);
 
-
   //diplay
-  int i = 0;
-  for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
-      cout << "|q" << i << "> = " << it->ket0 << "|0> + " << it->ket1 << "|1> :: " << measureQubit(*it) << endl;
-      i++;
-  }
+  // int i = 0;
+  // for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
+  //     cout << "|q" << i << "> = " << it->ket0 << "|0> + " << it->ket1 << "|1> :: " << measureQubit(*it) << endl;
+  //     i++;
+  // }
 
-cout << "=================================" << endl;
+
 
 }
 
 bool checkOpSize(list<qubit> qubits){
-  qubit q = qubits.front();
-  int opSize = q.ops.size();
+  int i = 0;
 
-  // for (std::list<matrix<double> >::iterator it=q.ops.begin(); it != q.ops.end(); ++it){
-  //     cout << it.size() << endl;
-  // }
+   for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
+     cout << "=================================" << endl;
+       cout << "q" << i << " |   opsize :: " << it->ops.size() << endl;
+       for (std::list<matrix<double> >::iterator it2=it->ops.begin(); it2 != it->ops.end(); ++it2){
+       cout << "op :: " << *it2 << endl;
+      }
+       i++;
+   }
 
-
-  cout << "q ops :: " << q.ops.front() << " |   opsize :: " << opSize << endl;
   return true;
  }
 
