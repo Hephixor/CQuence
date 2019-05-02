@@ -1,6 +1,6 @@
   #include "main.hpp"
 
-// g++ -o main main.cpp
+// g++ -std=c++11 -I boost_1_70_0 main.cpp -o main
 // g++ -g main.cpp -o main -L /usr/local/lib/ -lboost_filesystem
 
 int main(){
@@ -101,7 +101,7 @@ bool checkOpSize(list<qubit> qubits){
 
 
   cout << "q ops :: " << q.ops.front() << " |   opsize :: " << opSize << endl;
-
+  return true;
  }
 
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){
