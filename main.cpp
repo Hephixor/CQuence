@@ -18,9 +18,14 @@ int main(){
     q0.ops.push_back(mi);
     q0.ops.push_back(mi);
     q1.ops.push_back(mi);
+    q1.ops.push_back(mi);
+    q2.ops.push_back(mi);
     q2.ops.push_back(mi);
     q3.ops.push_back(mi);
+    q3.ops.push_back(mi);
     q4.ops.push_back(mi);
+    q4.ops.push_back(mi);
+    q5.ops.push_back(mi);
     q5.ops.push_back(mi);
 
     qubits.push_back(q0);
@@ -76,32 +81,45 @@ void run(list<qubit> qubits){
     cerr << "maximum size 16 qubits" << endl;
     }
 
-  checkOpSize(qubits);
+    if(checkOpSize(qubits)){
+      cout << "everything ready" << endl;
+      cout << " -------------- " << endl;
+      makeOperations(qubits);
+    }
+    else
+    {
+      cerr << "errors. cannot run program." << endl;
+    }
+    
 
-  //diplay
-  // int i = 0;
-  // for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
-  //     cout << "|q" << i << "> = " << it->ket0 << "|0> + " << it->ket1 << "|1> :: " << measureQubit(*it) << endl;
-  //     i++;
-  // }
-
-
+ // run .. 
 
 }
 
+void makeOperations(list<qubit> qubits){
+  
+}
+
 bool checkOpSize(list<qubit> qubits){
+  int opSize = qubits.front().ops.size();
+  bool valid = true;
   int i = 0;
+  cout << "expected length for all qubits : " << opSize << endl;
 
    for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
-     cout << "=================================" << endl;
-       cout << "q" << i << " |   opsize :: " << it->ops.size() << endl;
-       for (std::list<matrix<double> >::iterator it2=it->ops.begin(); it2 != it->ops.end(); ++it2){
-       cout << "op :: " << *it2 << endl;
+    cout << "=================================" << endl;
+    cout << "q" << i << " |   opsize :: " << it->ops.size() << endl;
+    for (std::list<matrix<double> >::iterator it2=it->ops.begin(); it2 != it->ops.end(); ++it2){
+      cout << "op :: " << *it2 << endl;
+       if(it->ops.size()!= opSize){
+         valid = false;
+         cerr << "ERROR : opSize is " << it->ops.size() << " should be " << opSize << endl;
+       }
       }
        i++;
    }
 
-  return true;
+  return valid;
  }
 
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){

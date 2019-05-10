@@ -27,6 +27,7 @@ struct qubit {
 
 
 void run(list<qubit>);
+void makeOperations(list<qubit>);
 void addOp(qubit,identity_matrix<double>);
 bool checkOpSize(list<qubit>);
 string measureQubit(qubit);
