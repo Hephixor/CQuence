@@ -1,5 +1,5 @@
   #include "main.hpp"
-
+  #include "gates.hpp"
 // g++ -std=c++11 -I boost_1_70_0 main.cpp -o main
 // g++ -g main.cpp -o main -L /usr/local/lib/ -lboost_filesystem
 
@@ -12,21 +12,28 @@ int main(){
   qubit q4 = qubitFactory(complex<double>(5,3),complex<double>(0,6));
   qubit q5 = qubitFactory(complex<double>(3,-4),complex<double>(7,2));
 
+  hadamard = matrix<complex<double> > (2, 2);
+  hadamard(0,0) = complex<double>(1/(sqrt(2)));
+  hadamard(0,1) = complex<double>(1/(sqrt(2)));
+  hadamard(1,0) = complex<double>(1/(sqrt(2)));
+  hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
+
+
   std::list<qubit> qubits;
 
     identity_matrix<double> mi (2);
     q0.ops.push_back(mi);
-    q0.ops.push_back(mi);
+    q0.ops.push_back(hadamard);
     q1.ops.push_back(mi);
     q1.ops.push_back(mi);
     q2.ops.push_back(mi);
-    q2.ops.push_back(mi);
+    q2.ops.push_back(hadamard);
     q3.ops.push_back(mi);
     q3.ops.push_back(mi);
+    q4.ops.push_back(hadamard);
     q4.ops.push_back(mi);
-    q4.ops.push_back(mi);
-    q5.ops.push_back(mi);
-    q5.ops.push_back(mi);
+    q5.ops.push_back(hadamard);
+    q5.ops.push_back(hadamard);
 
     qubits.push_back(q0);
     qubits.push_back(q1);
@@ -90,31 +97,67 @@ void run(list<qubit> qubits){
     {
       cerr << "errors. cannot run program." << endl;
     }
-    
 
- // run .. 
+
+ // run ..
 
 }
 
 void makeOperations(list<qubit> qubits){
-  
+  std::list<qubit>::iterator qIter;
+  std::list<matrix<complex<double> > >::iterator opsIter;
+
+  int nbOps = qubits.front().ops.size();
+
+  for(int i = 0 ; i < nbOps ; i++){
+    int j = 0;
+    for (qIter = qubits.begin(); qIter != qubits.end(); qIter++){
+      cout << "qubit " << j << " state :: " << qIter->state << endl;
+      cout << "qubit " << j << " operation " << i << endl;
+      matrix<complex<double> > currentOp;
+      opsIter = qIter->ops.begin();
+      advance(opsIter,i);
+      currentOp = *opsIter;
+
+      // Do matrix multiplication
+      //qIter->state = qIter->state * currentOp;
+      cout << "new qubit " << j << " state :: " << qIter->state << endl;
+      j++;
+    }
+    cout << endl;
+  }
+
 }
 
 bool checkOpSize(list<qubit> qubits){
+
   int opSize = qubits.front().ops.size();
   bool valid = true;
   int i = 0;
   cout << "expected length for all qubits : " << opSize << endl;
 
-   for (std::list<qubit>::iterator it=qubits.begin(); it != qubits.end(); ++it){
+    std::list<qubit>::iterator qIter;
+    std::list<matrix<complex<double> > >::iterator opsIter;
+
+   for (qIter = qubits.begin(); qIter != qubits.end(); qIter++){
     cout << "=================================" << endl;
-    cout << "q" << i << " |   opsize :: " << it->ops.size() << endl;
-    for (std::list<matrix<double> >::iterator it2=it->ops.begin(); it2 != it->ops.end(); ++it2){
-      cout << "op :: " << *it2 << endl;
-       if(it->ops.size()!= opSize){
-         valid = false;
-         cerr << "ERROR : opSize is " << it->ops.size() << " should be " << opSize << endl;
-       }
+    cout << "state :: " << qIter->state << endl;
+    cout << "q" << i << " |   opsize :: " << qIter->ops.size() << endl;
+    int j = 0;
+    for (opsIter = qIter->ops.begin(); opsIter != qIter->ops.end(); opsIter++){
+      cout << "Operation " << j << " : " << endl;
+      j++;
+      for(int s1=0; s1 < opsIter->size1(); s1++){
+        for(int s2=0; s2 < opsIter->size2(); s2++){
+          cout << opsIter->operator()(s1, s2) << " ";
+        }
+        cout << endl;
+      }
+
+      cout << endl;
+
+       if(qIter->ops.size()!= opSize){valid = false;cerr << "ERROR : opSize is " << qIter->ops.size() << " should be " << opSize << endl; }
+
       }
        i++;
    }
@@ -159,6 +202,10 @@ qubit qubitFactory(complex<double> fket0, complex<double> fket1){
   qubit q;
   q.ket0 = fket0;
   q.ket1 = fket1;
+
+  q.state = matrix<complex<double> > (2,1);
+  q.state(0,0) = q.ket0;
+  q.state(1,0) = q.ket1;
 
   return q;
 }

@@ -9,6 +9,7 @@ using namespace std;
 
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/io.hpp"
+#include "boost/qvm/mat_access.hpp"
 
 
 using namespace boost::numeric::ublas;
@@ -22,7 +23,8 @@ int matrix[2][2];
 struct qubit {
   complex<double> ket0;
   complex<double> ket1;
-  list<matrix<double> > ops;
+  matrix<complex<double> > state ;
+  list<matrix<complex<double> > > ops;
 };
 
 
