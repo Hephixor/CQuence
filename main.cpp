@@ -4,6 +4,25 @@
 // g++ -g main.cpp -o main -L /usr/local/lib/ -lboost_filesystem
 
 int main(){
+  // INTRO
+ cout <<"===========================================" << endl;    
+ cout <<"    ____ ___ " << endl;                          
+ cout <<"   / ___/ _ \\ _   _  ___ _ __   ___ ___ " << endl;    
+ cout <<"  | |  | | | | | | |/ _ \\ '_ \\ / __/ _ \\ " << endl;    
+ cout <<"  | |__| |_| | |_| |  __/ | | | (_|  __/ " << endl;    
+ cout <<"   \\____\\__\\_\\ __,_|\\___|_| |_|\\___\\___| " << endl; 
+ cout << "" << endl;
+ cout <<"===========================================" << endl;   
+
+//     ____ ___                            
+//   / ___/ _ \ _   _  ___ _ __   ___ ___ 
+//  | |  | | | | | | |/ _ \ '_ \ / __/ _ \
+//  | |__| |_| | |_| |  __/ | | | (_|  __/
+//   \____\__\_\\__,_|\___|_| |_|\___\___|
+                                        
+                                       
+
+
   // initialisation
   qubit q0 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
   qubit q1 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
@@ -12,16 +31,16 @@ int main(){
   qubit q4 = qubitFactory(complex<double>(5,3),complex<double>(0,6));
   qubit q5 = qubitFactory(complex<double>(3,-4),complex<double>(7,2));
 
-  hadamard = matrix<complex<double> > (2, 2);
+  matrix<complex<double> > hadamard (2, 2);
   hadamard(0,0) = complex<double>(1/(sqrt(2)));
   hadamard(0,1) = complex<double>(1/(sqrt(2)));
   hadamard(1,0) = complex<double>(1/(sqrt(2)));
   hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
 
 
-  std::list<qubit> qubits;
-
+    std::list<qubit> qubits;
     identity_matrix<double> mi (2);
+
     q0.ops.push_back(mi);
     q0.ops.push_back(hadamard);
     q1.ops.push_back(mi);
@@ -42,43 +61,7 @@ int main(){
     qubits.push_back(q4);
     qubits.push_back(q5);
 
-    // matrix<double> gnot (2, 2);
-    // gnot(0,0)=0;
-    // gnot(0,1)=1;
-    // gnot(1,0)=1;
-    // gnot(1,1)=0;
-    //
-    // for (unsigned i = 0; i < gnot.size1 (); ++ i){
-    //   cout << "" << endl;
-    //  for (unsigned j = 0; j < gnot.size2 (); ++ j){
-    //    cout << gnot(i,j) << " ";
-    //   }
-    //
-    //  }
-    //  cout << endl;
-
-     // cout << "q5 as matrix : " << endl;
-     // matrix<complex<double> > mq = qubitAsHorizontalMatrix(q5);
-     //     for (unsigned i = 0; i < mq.size1 (); ++ i){
-     //       cout << "" << endl;
-     //      for (unsigned j = 0; j < mq.size2 (); ++ j){
-     //        cout << mq(i,j) << " ";
-     //       }
-     //      }
-     // cout << endl;
-      //
-      // identity_matrix<double> mi (2);
-      //  matrix<complex<double> > mqi (1,2);
-      //  mqi = prod(mq,mi);
-      //
-      //        for (unsigned i = 0; i < mqi.size1 (); ++ i){
-      //          cout << "" << endl;
-      //         for (unsigned j = 0; j < mqi.size2 (); ++ j){
-      //           cout << mqi(i,j) << " ";
-      //          }
-      //   }
-      //  cout << endl;
-        run(qubits);
+    run(qubits);
 
 }
 
@@ -92,14 +75,14 @@ void run(list<qubit> qubits){
       cout << "everything ready" << endl;
       cout << " -------------- " << endl;
       makeOperations(qubits);
+      measureQubits(qubits);
+
     }
     else
     {
       cerr << "errors. cannot run program." << endl;
     }
 
-
- // run ..
 
 }
 
@@ -118,10 +101,13 @@ void makeOperations(list<qubit> qubits){
       opsIter = qIter->ops.begin();
       advance(opsIter,i);
       currentOp = *opsIter;
-
+     // cout << " currentOp type " << typeid(currentOp).name() << endl;
       // Do matrix multiplication
-      //qIter->state = qIter->state * currentOp;
-      cout << "new qubit " << j << " state :: " << qIter->state << endl;
+      cout << "multiplication " << qIter->state << " * " << currentOp << endl;
+      qIter->state = prod(qubitAsHorizontalMatrix(*qIter),currentOp);
+      cout << "new qubit " << j << " state :: " ;
+      displayMatrix(qIter->state);
+      cout << endl;
       j++;
     }
     cout << endl;
@@ -149,14 +135,14 @@ bool checkOpSize(list<qubit> qubits){
       j++;
       for(int s1=0; s1 < opsIter->size1(); s1++){
         for(int s2=0; s2 < opsIter->size2(); s2++){
-          cout << opsIter->operator()(s1, s2) << " ";
+          cout << opsIter->operator()(s1, s2) << " " << endl;;
         }
         cout << endl;
       }
 
       cout << endl;
 
-       if(qIter->ops.size()!= opSize){valid = false;cerr << "ERROR : opSize is " << qIter->ops.size() << " should be " << opSize << endl; }
+       if(qIter->ops.size()!= opSize){valid = false;cerr << "ERROR : q" << i<< " opSize is " << qIter->ops.size() << " should be " << opSize << endl; }
 
       }
        i++;
@@ -165,7 +151,19 @@ bool checkOpSize(list<qubit> qubits){
   return valid;
  }
 
+void displayMatrix(matrix<complex<double> > m){
+  for(int s1=0; s1 < m.size1(); s1++){
+        for(int s2=0; s2 < m.size2(); s2++){
+          cout << m.operator()(s1, s2) << " " << endl;;
+        }
+      }
+}
+
+
+
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){
+  // q.ket0=q.state.operator()(0,0);
+  // q.ket1=q.state.operator()(1,0);
   matrix<complex<double> > mq (1,2);
   mq(0,0)=q.ket0;
   mq(0,1)=q.ket1;
@@ -174,17 +172,30 @@ matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){
 
 
 matrix<complex<double> > qubitAsVerticalMatrix(qubit q){
+  // q.ket0=q.state.operator()(0,0);
+  // q.ket1=q.state.operator()(1,0);
   matrix<complex<double> > mq (2,1);
   mq(0,0)=q.ket0;
   mq(1,0)=q.ket1;
   return mq;
 }
 
+void measureQubits(list<qubit> qubits){
+  std::list<qubit>::iterator qIter;
+
+  for(qIter=qubits.begin(); qIter!=qubits.end(); advance(qIter,1)){
+    cout <<  measureQubit(*qIter) << endl;
+  }
+}
 
 string measureQubit(qubit q){
-  double totalVecLen = sqrt((abs(q.ket0) * abs(q.ket0)) + (abs(q.ket1) * abs(q.ket1)));
-  double p0 = double(abs(q.ket0)*abs(q.ket0))/double(totalVecLen*totalVecLen);
-  double p1 = double(abs(q.ket1)*abs(q.ket1))/double(totalVecLen*totalVecLen);
+  complex<double> cket0;
+  complex<double> cket1;
+  cket0 = q.state.operator()(0,0);
+  cket1 = q.state.operator()(1,0);
+  double totalVecLen = sqrt((abs(cket0) * abs(cket0)) + (abs(cket1) * abs(cket1)));
+  double p0 = double(abs(cket0)*abs(cket0))/double(totalVecLen*totalVecLen);
+  double p1 = double(abs(cket1)*abs(cket1))/double(totalVecLen*totalVecLen);
   double total = p0 + p1;
   string eval;
 
@@ -199,6 +210,7 @@ string measureQubit(qubit q){
 
 
 qubit qubitFactory(complex<double> fket0, complex<double> fket1){
+  // normalize TODO
   qubit q;
   q.ket0 = fket0;
   q.ket1 = fket1;

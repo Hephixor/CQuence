@@ -1,1 +1,1 @@
-static matrix<complex<double> > hadamard;
+//extern matrix<complex<double> > hadamard;
