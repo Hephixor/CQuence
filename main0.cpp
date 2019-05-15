@@ -1,83 +1,117 @@
-  #include "main.hpp"
-  #include "gates.hpp"
+  #include "main0.hpp"
+//  #include "gates.hpp"
 // g++ -std=c++11 -I boost_1_70_0 main.cpp -o main
 // g++ -g main.cpp -o main -L /usr/local/lib/ -lboost_filesystem
 
 int main(){
+  //Intro
+cout <<"========================================" << endl;
+cout <<"  ____ ___                            " << endl;
+cout <<" / ___/ _ \\ _   _  ___ _ __   ___ ___ " << endl;
+cout <<"| |  | | | | | | |/ _ \\ '_ \\ / __/ _ \\ " << endl;
+cout <<"| |__| |_| | |_| |  __/ | | | (_|  __/ " << endl;
+cout <<" \\____\\__\\_ \\__,_|\\___|_| |_|\\___\\___| " << endl;
+cout << "" << endl;
+cout <<"========================================" << endl;
+
+
   // initialisation
-  qubit q0 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
+  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(1,0));
   qubit q1 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-  qubit q2 = qubitFactory(complex<double>(0.3,0),complex<double>(0.7,0));
-  qubit q3 = qubitFactory(complex<double>(0.5,0),complex<double>(0.5,0));
-  qubit q4 = qubitFactory(complex<double>(5,3),complex<double>(0,6));
-  qubit q5 = qubitFactory(complex<double>(3,-4),complex<double>(7,2));
+  // qubit q2 = qubitFactory(complex<double>(0.3,0),complex<double>(0.7,0));
+  // qubit q3 = qubitFactory(complex<double>(0.5,0),complex<double>(0.5,0));
+  // qubit q4 = qubitFactory(complex<double>(5,3),complex<double>(0,6));
+  // qubit q5 = qubitFactory(complex<double>(3,-4),complex<double>(7,2));
+
+    matrix<complex<double> > v (3,1);
+    matrix<complex<double> > w (1,2);
+
+    matrix<complex<double> > x (2,3);
+    matrix<complex<double> > y (2,2);
+
+    v(0,0)=1;
+    v(1,0)=2;
+    v(2,0)=3;
+
+    w(0,0)=4;
+    w(0,1)=5;
+
+    x(0,0)=1;
+    x(0,1)=2;
+    x(0,2)=3;
+    x(1,0)=4;
+    x(1,1)=5;
+    x(1,2)=6;
+
+    y(0,0)=7;
+    y(0,1)=8;
+    y(1,0)=9;
+    y(1,1)=10;
+
+    matrix<complex<double> > f1 (2,2);
+    matrix<complex<double> > f2 (2,2);
+    matrix<complex<double> > f3 (2,2);
+    matrix<complex<double> > f4 (2,2);
+
+    // always 0
+    f1(0,0)=1;
+    f1(0,1)=1;
+    f1(1,0)=0;
+    f1(1,1)=0;
+
+    // always 1
+    f1(0,0)=0;
+    f1(0,1)=0;
+    f1(1,0)=1;
+    f1(1,1)=1;
+
+    // not
+    f1(0,0)=0;
+    f1(0,1)=1;
+    f1(1,0)=1;
+    f1(1,1)=0;
+
+    // identity
+    f1(0,0)=1;
+    f1(0,1)=0;
+    f1(1,0)=0;
+    f1(1,1)=1;
+
+
+
+
+
+    cout << "tensorProduct" << endl << endl;;
+    displayFancyMatrix(tensorProduct(v,w));
+    cout << "=====" << endl;
+    displayFancyMatrix(tensorProduct(x,y));
+    cout << "=====" << endl;
+    displayFancyMatrix(tensorProduct(q0.state,q1.state));
+    cout << "=====" << endl;
 
   std::list<qubit> qubits;
 
-  // matrix<complex<double> > hadamard (2,2);
-  // hadamard(0,0) = complex<double>(1/(sqrt(2)));
-  // hadamard(0,1) = complex<double>(1/(sqrt(2)));
-  // hadamard(1,0) = complex<double>(1/(sqrt(2)));
-  // hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
+  // Operation matrix
+  matrix<complex<double> > hadamard (2,2);
+  hadamard(0,0) = complex<double>(1/(sqrt(2)));
+  hadamard(0,1) = complex<double>(1/(sqrt(2)));
+  hadamard(1,0) = complex<double>(1/(sqrt(2)));
+  hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
 
-    identity_matrix<double> mi (2);
-    q0.ops.push_back(mi);
-    q0.ops.push_back(hadamard);
-    q1.ops.push_back(mi);
-    q1.ops.push_back(mi);
-    q2.ops.push_back(mi);
-    q2.ops.push_back(hadamard);
-    q3.ops.push_back(mi);
-    q3.ops.push_back(mi);
-    q4.ops.push_back(hadamard);
-    q4.ops.push_back(mi);
-    q5.ops.push_back(hadamard);
-    q5.ops.push_back(hadamard);
+  identity_matrix<double> mi (2);
 
-    qubits.push_back(q0);
-    qubits.push_back(q1);
-    qubits.push_back(q2);
-    qubits.push_back(q3);
-    qubits.push_back(q4);
-    qubits.push_back(q5);
+  q0.ops.push_back(hadamard);
+  q1.ops.push_back(hadamard);
 
-    // matrix<double> gnot (2, 2);
-    // gnot(0,0)=0;
-    // gnot(0,1)=1;
-    // gnot(1,0)=1;
-    // gnot(1,1)=0;
-    //
-    // for (unsigned i = 0; i < gnot.size1 (); ++ i){
-    //   cout << "" << endl;
-    //  for (unsigned j = 0; j < gnot.size2 (); ++ j){
-    //    cout << gnot(i,j) << " ";
-    //   }
-    //
-    //  }
-    //  cout << endl;
+  // function
 
-     // cout << "q5 as matrix : " << endl;
-     // matrix<complex<double> > mq = qubitAsHorizontalMatrix(q5);
-     //     for (unsigned i = 0; i < mq.size1 (); ++ i){
-     //       cout << "" << endl;
-     //      for (unsigned j = 0; j < mq.size2 (); ++ j){
-     //        cout << mq(i,j) << " ";
-     //       }
-     //      }
-     // cout << endl;
-      //
-      // identity_matrix<double> mi (2);
-      //  matrix<complex<double> > mqi (1,2);
-      //  mqi = prod(mq,mi);
-      //
-      //        for (unsigned i = 0; i < mqi.size1 (); ++ i){
-      //          cout << "" << endl;
-      //         for (unsigned j = 0; j < mqi.size2 (); ++ j){
-      //           cout << mqi(i,j) << " ";
-      //          }
-      //   }
-      //  cout << endl;
-        run(qubits);
+  q0.ops.push_back(hadamard);
+  q1.ops.push_back(mi);
+
+  qubits.push_back(q0);
+  qubits.push_back(q1);
+
+  //run(qubits);
 
 }
 
@@ -102,6 +136,48 @@ void run(list<qubit> qubits){
 
 }
 
+void displayFancyMatrix(matrix<complex<double> > m){
+  for(int i = 0 ; i < m.size1(); i++){
+    for(int j = 0 ; j < m.size2(); j++){
+      cout << m.operator()(i,j).real() << "\t";
+    }
+    cout << "" << endl;
+  }
+}
+
+matrix<complex<double> > tensorProduct(matrix<complex<double> > m1, matrix<complex<double> > m2){
+  int startRow,startCol,i,j,k,l;
+
+
+
+  int rowA = m1.size1();
+  int colA = m1.size2();
+  int rowB = m2.size1();
+  int colB = m2.size2();
+  int rowC = rowA*rowB;
+  int colC = colA*colB;
+
+
+  matrix<complex<double> > result (rowC,colC);
+
+
+	for(i=0;i<rowA;i++){
+		for(j=0;j<colA;j++){
+			startRow = i*rowB;
+			startCol = j*colB;
+			for(k=0;k<rowB;k++){
+				for(l=0;l<colB;l++){
+          result(startRow+k,startCol+l) = m1.operator()(i,j)*m2.operator()(k,l);
+			//		matrixC[startRow+k][startCol+l] = matrixA[i][j]*matrixB[k][l];
+				}
+			}
+		}
+	}
+
+  return result;
+
+}
+
 void makeOperations(list<qubit> qubits){
   std::list<qubit>::iterator qIter;
   std::list<matrix<complex<double> > >::iterator opsIter;
@@ -119,7 +195,7 @@ void makeOperations(list<qubit> qubits){
       currentOp = *opsIter;
 
       // Do matrix multiplication
-      //qIter->state = qIter->state * currentOp;
+      qIter->state = prod(qubitAsHorizontalMatrix(*qIter),currentOp);
       cout << "new qubit " << j << " state :: " << qIter->state << endl;
       j++;
     }
