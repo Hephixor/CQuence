@@ -7,6 +7,14 @@
 
 using namespace std;
 
+namespace std {
+  template <typename _CharT, typename _Traits>
+  inline basic_ostream<_CharT, _Traits> &
+  tab(basic_ostream<_CharT, _Traits> &__os) {
+    return __os.put(__os.widen('\t'));
+  }
+}
+
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/io.hpp"
 #include "boost/qvm/mat_access.hpp"
@@ -32,9 +40,18 @@ void run(list<qubit>);
 void makeOperations(list<qubit>);
 void addOp(qubit,identity_matrix<double>);
 bool checkOpSize(list<qubit>);
+bool measureQubit(qubit);
 qubit qubitFactory(complex<double>, complex<double>);
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit);
 matrix<complex<double> > qubitAsVerticalMatrix(qubit);
-void displayMatrix(matrix<complex<double> >);
-string measureQubit(qubit);
+matrix<complex<double> > tensorProduct(matrix<complex<double> >, matrix<complex<double> >);
+void displayFancyMatrix(matrix<complex<double> >);
+matrix<complex<double> > switchHVMatrix(matrix<complex<double> >);
+matrix<complex<double> > switchVHMatrix(matrix<complex<double> >);
 void measureQubits(list<qubit>);
+qubit applyGate(qubit,matrix<complex<double> > );
+matrix<complex<double> > applyGateFromMatrix(matrix<complex<double> >,matrix<complex<double> >);
+bool runDeutsch(int);
+void oracleConstantZero(list<qubit>, qubit);
+void oracleConstantOne(list<qubit>, qubit);
+void deutsch();
