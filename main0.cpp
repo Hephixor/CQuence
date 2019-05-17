@@ -16,8 +16,8 @@ cout <<"========================================" << endl;
 
 
   // initialisation
-  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(1,0));
-  qubit q1 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
+  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
+  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
   // qubit q2 = qubitFactory(complex<double>(0.3,0),complex<double>(0.7,0));
   // qubit q3 = qubitFactory(complex<double>(0.5,0),complex<double>(0.5,0));
   // qubit q4 = qubitFactory(complex<double>(5,3),complex<double>(0,6));
@@ -79,15 +79,13 @@ cout <<"========================================" << endl;
 
 
 
-
-
-    cout << "tensorProduct" << endl << endl;;
-    displayFancyMatrix(tensorProduct(v,w));
-    cout << "=====" << endl;
-    displayFancyMatrix(tensorProduct(x,y));
-    cout << "=====" << endl;
-    displayFancyMatrix(tensorProduct(q0.state,q1.state));
-    cout << "=====" << endl;
+    // cout << "tensorProduct" << endl << endl;;
+    // displayFancyMatrix(tensorProduct(v,w));
+    // cout << "=====" << endl;
+    // displayFancyMatrix(tensorProduct(x,y));
+    // cout << "=====" << endl;
+    // displayFancyMatrix(tensorProduct(q0.state,q1.state));
+    // cout << "=====" << endl;
 
   std::list<qubit> qubits;
 
@@ -98,7 +96,7 @@ cout <<"========================================" << endl;
   hadamard(1,0) = complex<double>(1/(sqrt(2)));
   hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
 
-  identity_matrix<double> mi (2);
+  identity_matrix<double> identity (2);
 
   q0.ops.push_back(hadamard);
   q1.ops.push_back(hadamard);
@@ -106,12 +104,12 @@ cout <<"========================================" << endl;
   // function
 
   q0.ops.push_back(hadamard);
-  q1.ops.push_back(mi);
+  q1.ops.push_back(identity);
 
   qubits.push_back(q0);
   qubits.push_back(q1);
 
-  //run(qubits);
+  run(qubits);
 
 }
 
@@ -139,7 +137,7 @@ void run(list<qubit> qubits){
 void displayFancyMatrix(matrix<complex<double> > m){
   for(int i = 0 ; i < m.size1(); i++){
     for(int j = 0 ; j < m.size2(); j++){
-      cout << m.operator()(i,j).real() << "\t";
+      cout << m.operator()(i,j) << "\t";
     }
     cout << "" << endl;
   }
@@ -147,19 +145,13 @@ void displayFancyMatrix(matrix<complex<double> > m){
 
 matrix<complex<double> > tensorProduct(matrix<complex<double> > m1, matrix<complex<double> > m2){
   int startRow,startCol,i,j,k,l;
-
-
-
   int rowA = m1.size1();
   int colA = m1.size2();
   int rowB = m2.size1();
   int colB = m2.size2();
   int rowC = rowA*rowB;
   int colC = colA*colB;
-
-
   matrix<complex<double> > result (rowC,colC);
-
 
 	for(i=0;i<rowA;i++){
 		for(j=0;j<colA;j++){
@@ -168,7 +160,6 @@ matrix<complex<double> > tensorProduct(matrix<complex<double> > m1, matrix<compl
 			for(k=0;k<rowB;k++){
 				for(l=0;l<colB;l++){
           result(startRow+k,startCol+l) = m1.operator()(i,j)*m2.operator()(k,l);
-			//		matrixC[startRow+k][startCol+l] = matrixA[i][j]*matrixB[k][l];
 				}
 			}
 		}
@@ -185,18 +176,29 @@ void makeOperations(list<qubit> qubits){
   int nbOps = qubits.front().ops.size();
 
   for(int i = 0 ; i < nbOps ; i++){
+    cout << "=============================" << endl;
     int j = 0;
     for (qIter = qubits.begin(); qIter != qubits.end(); qIter++){
-      cout << "qubit " << j << " state :: " << qIter->state << endl;
-      cout << "qubit " << j << " operation " << i << endl;
+      // Current state
+      cout << "qubit " << j << " state :: " <<endl;
+      displayFancyMatrix(qIter->state) ;
+      cout << "" << endl << "qubit " << j << " operation " << i << endl;
+
       matrix<complex<double> > currentOp;
       opsIter = qIter->ops.begin();
       advance(opsIter,i);
       currentOp = *opsIter;
 
       // Do matrix multiplication
-      qIter->state = prod(qubitAsHorizontalMatrix(*qIter),currentOp);
-      cout << "new qubit " << j << " state :: " << qIter->state << endl;
+      cout << "current op:: " << endl << currentOp << endl;
+
+      qIter->state = switchHVMatrix(prod(switchVHMatrix(qIter->state),currentOp));
+
+     // cout << "new state expected :: " << endl << switchHVMatrix(prod(switchVHMatrix(qIter->state),currentOp)) << endl;
+
+      cout << "new qubit " << j << " state :: " << endl;
+      displayFancyMatrix(qIter->state);
+      cout << "" << endl;
       j++;
     }
     cout << endl;
@@ -239,6 +241,20 @@ bool checkOpSize(list<qubit> qubits){
 
   return valid;
  }
+
+matrix<complex<double> > switchHVMatrix(matrix<complex<double> > m){
+  matrix<complex<double> > r (2,1);
+  r(0,0)=m.operator()(0,0);
+  r(1,0)=m.operator()(0,1);
+  return r;
+}
+
+matrix<complex<double> > switchVHMatrix(matrix<complex<double> > m){
+  matrix<complex<double> > r (1,2);
+  r(0,0)=m.operator()(0,0);
+  r(0,1)=m.operator()(1,0);
+  return r;
+}
 
 matrix<complex<double> > qubitAsHorizontalMatrix(qubit q){
   matrix<complex<double> > mq (1,2);

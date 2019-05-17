@@ -46,3 +46,5 @@ matrix<complex<double> > qubitAsHorizontalMatrix(qubit);
 matrix<complex<double> > qubitAsVerticalMatrix(qubit);
 matrix<complex<double> > tensorProduct(matrix<complex<double> >, matrix<complex<double> >);
 void displayFancyMatrix(matrix<complex<double> >);
+matrix<complex<double> > switchHVMatrix(matrix<complex<double> >);
+matrix<complex<double> > switchVHMatrix(matrix<complex<double> >);
