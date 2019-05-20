@@ -20,7 +20,7 @@ cout <<"========================================" << endl;
   /* Deutsch algorithm */
   // initialization ---
   qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-  qubit q1 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
+  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
   std::list<qubit> qubits;
 
   // operation matrix
@@ -163,16 +163,20 @@ void deutsch(){
   displayFancyMatrix(hadamardTensor);
   cout <<endl << endl;
   displayFancyMatrix(oracleTensor);
+  cout << endl << endl;
   
-  cout << " apply hadamard tensor " << endl;
-  qRegisterp = prod(hadamardTensor,qRegister);
-  cout << qRegisterp <<endl << endl;
-  cout << "apply oracle tensor" << endl;
-  qRegisterpp = prod(oracleTensor,qRegisterp);
-  cout << qRegisterpp <<endl << endl;
-  cout << " apply identity hadamard tensor " << endl;
-  qRegisterppp = prod(identityHadamardTensor,qRegisterpp);
-  cout << qRegisterppp <<endl << endl;
+  cout << "apply HxI * Uf " << endl;
+  qRegisterp =  prod(identityHadamardTensor,oracleTensor);
+  displayFancyMatrix(qRegisterp);
+  cout <<endl << endl;
+  cout << "apply (HxI * Uf) * HxH" << endl;
+  qRegisterpp = prod(qRegisterp,hadamardTensor);
+  displayFancyMatrix(qRegisterpp);
+  cout <<endl << endl;
+  cout << "apply ((HxI * Uf) * HxH) * qRegister" << endl;
+  qRegisterppp = prod(qRegisterpp,qRegister);
+  displayFancyMatrix(qRegisterppp);
+  cout <<endl << endl;
 
 
 }
@@ -294,7 +298,7 @@ qubit applyGate(qubit q, matrix<complex<double> > gate){
 void displayFancyMatrix(matrix<complex<double> > m){
   for(int i = 0 ; i < m.size1(); i++){
     for(int j = 0 ; j < m.size2(); j++){
-      cout << m.operator()(i,j) ;
+      cout << m.operator()(i,j) << " " ;
     }
     cout << "" << endl;
   }
