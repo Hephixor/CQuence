@@ -51,7 +51,5 @@ matrix<complex<double> > switchVHMatrix(matrix<complex<double> >);
 void measureQubits(list<qubit>);
 qubit applyGate(qubit,matrix<complex<double> > );
 matrix<complex<double> > applyGateFromMatrix(matrix<complex<double> >,matrix<complex<double> >);
-bool runDeutsch(int);
-void oracleConstantZero(list<qubit>, qubit);
-void oracleConstantOne(list<qubit>, qubit);
 void deutsch();
+void deutschJozsa(int);

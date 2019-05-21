@@ -14,137 +14,111 @@ cout <<" \\____\\__\\_ \\__,_|\\___|_| |_|\\___\\___| " << endl;
 cout << "" << endl;
 cout <<"========================================" << endl;
 
-
-
-
-  /* Deutsch algorithm */
-  // initialization ---
-  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
-  std::list<qubit> qubits;
-
-  // operation matrix
-  identity_matrix<double> identity (2);
-  matrix<complex<double> > hadamard (2,2);
-  hadamard(0,0) = complex<double>(1/(sqrt(2)));
-  hadamard(0,1) = complex<double>(1/(sqrt(2)));
-  hadamard(1,0) = complex<double>(1/(sqrt(2)));
-  hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
-
-  // functions --------
-  matrix<complex<double> > f1 (2,2);
-  matrix<complex<double> > f2 (2,2);
-  matrix<complex<double> > f3 (2,2);
-  matrix<complex<double> > f4 (2,2);
-
-  // always 0
-  f1(0,0)=1;
-  f1(0,1)=1;
-  f1(1,0)=0;
-  f1(1,1)=0;
-
-  // always 1
-  f2(0,0)=0;
-  f2(0,1)=0;
-  f2(1,0)=1;
-  f2(1,1)=1;
-
-  // not
-  f3(0,0)=0;
-  f3(0,1)=1;
-  f3(1,0)=1;
-  f3(1,1)=0;
-
-  // identity
-  f4(0,0)=1;
-  f4(0,1)=0;
-  f4(1,0)=0;
-  f4(1,1)=1;
-
-  // operations ------
-  // q0.ops.push_back(hadamard);
-  // q1.ops.push_back(hadamard);
-
-  // // ... run function
-
-  // q0.ops.push_back(f1);
-  // q1.ops.push_back(f1);
-
-  // q0.ops.push_back(hadamard);
-  // q1.ops.push_back(identity);
-
-
-  // qubits.push_back(q0);
-  // qubits.push_back(q1);
-
-  // q0 = applyGate(q0,hadamard);
-  // q1 = applyGate(q1,hadamard);
-  // cout << endl << "tensor : " << endl;
-  // displayFancyMatrix(tensorProduct(q0.state,q1.state));
-  //displayFancyMatrix(applyGateFromMatrix(tensorProduct(q0.state,q1.state),hadamard));
-  // if(runDeutsch(2)){
-  //   cout << "function is constant " << endl;
-  // }
-  // else{
-  //   cout << "function is balanced " << endl;
-  // }
-
-
- deutsch();
-  //run(qubits);
-
-
-    // matrix<complex<double> > v (3,1);
-    // matrix<complex<double> > w (1,2);
-
-    // matrix<complex<double> > x (2,3);
-    // matrix<complex<double> > y (2,2);
-
-    // v(0,0)=1;
-    // v(1,0)=2;
-    // v(2,0)=3;
-
-    // w(0,0)=4;
-    // w(0,1)=5;
-
-    // x(0,0)=1;
-    // x(0,1)=2;
-    // x(0,2)=3;
-    // x(1,0)=4;
-    // x(1,1)=5;
-    // x(1,2)=6;
-
-    // y(0,0)=7;
-    // y(0,1)=8;
-    // y(1,0)=9;
-    // y(1,1)=10;
-
-    // cout << "tensorProduct" << endl << endl;;
-    // displayFancyMatrix(tensorProduct(v,w));
-    // cout << "=====" << endl;
-    // displayFancyMatrix(tensorProduct(x,y));
-    // cout << "=====" << endl;
-    // displayFancyMatrix(tensorProduct(q0.state,q1.state));
-    // cout << "=====" << endl;
-
+ //deutsch();
+ deutschJozsa(4);
+ //run(qubits);
 }
 
-void deutsch(){
+void deutschJozsa(int size){
+  // Declare variables
   identity_matrix<double> identity (2);
   matrix<complex<double> > hadamard (2,2);
+  matrix<complex<double> > f0 (2,2);
+  matrix<complex<double> > oracle (2,2);
+  list<qubit> qubits;
+  std::list<qubit>::iterator qIter;
+  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
+  int tensorSize = pow(2,size);
+  matrix<complex<double> > qRegister (tensorSize,1);
+  matrix<complex<double> > qRegisterp (tensorSize,1);
+  matrix<complex<double> > qRegisterpp (tensorSize,1);
+  matrix<complex<double> > qRegisterppp (tensorSize,1);
+  matrix<complex<double> > hadamardTensor (tensorSize,tensorSize);
+  matrix<complex<double> > oracleTensor (tensorSize,tensorSize);
+  matrix<complex<double> > identityHadamardTensor (tensorSize,tensorSize);
+
+  // Initialize variables
   hadamard(0,0) = complex<double>(1/(sqrt(2)));
   hadamard(0,1) = complex<double>(1/(sqrt(2)));
   hadamard(1,0) = complex<double>(1/(sqrt(2)));
   hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
-  matrix<complex<double> > f0 (2,2);
   f0(0,0)=1;
   f0(0,1)=0;
   f0(1,0)=0;
   f0(1,1)=1;
+  oracle = f0;
+  for(int x = 1 ; x < size ; x++){
+    qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
+    qubits.push_back(q0);
+  }
+  cout << "tensorSize" << tensorSize << endl;
+ 
+  // Intricate qubits
+  matrix<complex<double> > tmpReg;
+  tmpReg = qubits.front().state;
+  qIter = qubits.begin();
+  for(int i = 2 ; i < size ; i++){
+    tmpReg = tensorProduct(tmpReg, qIter->state);
+    advance(qIter,1);
+  }
 
-  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
+  qubits.push_back(q1);
+  qRegister = tensorProduct(tmpReg,q1.state);
 
+  // Build hadamard tensor
+  hadamardTensor = tensorProduct(hadamard,hadamard);
+  for(int i = 2 ; i < size ; i ++){
+    hadamardTensor = tensorProduct(hadamardTensor, hadamard);
+  }
+
+  // Build oracle tensor
+  oracleTensor = tensorProduct(oracle,oracle);
+  for(int j = 2 ; j < size ; j++){
+    oracleTensor = tensorProduct(oracleTensor, oracle);
+  }
+
+  // Build hadamard tensor and identity tensor
+  identityHadamardTensor = tensorProduct(identity,hadamard);
+  for(int k = 2; k < size ; k++){
+    identityHadamardTensor = tensorProduct(identityHadamardTensor,hadamard);
+  }
+
+  // Some display
+  cout << "qRegister" << endl;
+  displayFancyMatrix(qRegister) ;
+  cout <<endl << endl;
+  cout << "hadamardTensor" << endl;
+  displayFancyMatrix(hadamardTensor);
+  cout <<endl << endl;
+  cout << "oracleTensor" << endl;
+  displayFancyMatrix(oracleTensor);
+  cout << endl << endl;
+  
+  // apply HxI * Uf
+  cout << "apply HxI * Uf " << endl;
+  qRegisterp =  prod(identityHadamardTensor,oracleTensor);
+  displayFancyMatrix(qRegisterp);
+  cout <<endl << endl;
+  // apply (HxI * Uf) * HxH
+  cout << "apply (HxI * Uf) * HxH" << endl;
+  qRegisterpp = prod(qRegisterp,hadamardTensor);
+  displayFancyMatrix(qRegisterpp);
+  cout <<endl << endl;
+  // apply ((HxI * Uf) * HxH) * qRegister
+  cout << "apply ((HxI * Uf) * HxH) * qRegister" << endl;
+  qRegisterppp = prod(qRegisterpp,qRegister);
+  displayFancyMatrix(qRegisterppp);
+  cout <<endl << endl;
+
+  // qRegisterppp now contains final intricated qubits quarrying the result of the algo
+
+}
+
+void deutsch(){
+  // Declare variables
+  identity_matrix<double> identity (2);
+  matrix<complex<double> > hadamard (2,2);
+  matrix<complex<double> > f0 (2,2);
   matrix<complex<double> > qRegister (4,1);
   matrix<complex<double> > qRegisterp (4,1);
   matrix<complex<double> > qRegisterpp (4,1);
@@ -152,12 +126,24 @@ void deutsch(){
   matrix<complex<double> > hadamardTensor (4,4);
   matrix<complex<double> > oracleTensor (4,4);
   matrix<complex<double> > identityHadamardTensor (4,4);
+  qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
+  qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
 
+  // Initialize variables
+  f0(0,0)=1;
+  f0(0,1)=0;
+  f0(1,0)=0;
+  f0(1,1)=1;
+  hadamard(0,0) = complex<double>(1/(sqrt(2)));
+  hadamard(0,1) = complex<double>(1/(sqrt(2)));
+  hadamard(1,0) = complex<double>(1/(sqrt(2)));
+  hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
   qRegister = tensorProduct(q0.state,q1.state);
   hadamardTensor = tensorProduct(hadamard,hadamard);
   oracleTensor = tensorProduct(f0,f0);
   identityHadamardTensor = tensorProduct(identity,hadamard);
 
+  // Some display
   displayFancyMatrix(qRegister) ;
   cout <<endl << endl;
   displayFancyMatrix(hadamardTensor);
@@ -165,20 +151,26 @@ void deutsch(){
   displayFancyMatrix(oracleTensor);
   cout << endl << endl;
   
+  // apply HxI * Uf 
   cout << "apply HxI * Uf " << endl;
   qRegisterp =  prod(identityHadamardTensor,oracleTensor);
   displayFancyMatrix(qRegisterp);
   cout <<endl << endl;
+  // apply (HxI * Uf) * HxH
   cout << "apply (HxI * Uf) * HxH" << endl;
   qRegisterpp = prod(qRegisterp,hadamardTensor);
   displayFancyMatrix(qRegisterpp);
   cout <<endl << endl;
+  // apply ((HxI * Uf) * HxH) * qRegister
   cout << "apply ((HxI * Uf) * HxH) * qRegister" << endl;
   qRegisterppp = prod(qRegisterpp,qRegister);
   displayFancyMatrix(qRegisterppp);
   cout <<endl << endl;
 
-
+  /* qRegisterppp now contains final intricated qubits quarrying the result of the algo
+     We can see that except the tensor initialization, the number of operation needed to
+     compute wether f is balanced or constant is the same 
+  */
 }
 
 void run(list<qubit> qubits){
@@ -198,72 +190,6 @@ void run(list<qubit> qubits){
       cerr << "errors. cannot run program." << endl;
     }
 }
-
-bool runDeutsch(int nbQubit){
-  identity_matrix<double> identity (2);
-  matrix<complex<double> > hadamard (2,2);
-  hadamard(0,0) = complex<double>(1/(sqrt(2)));
-  hadamard(0,1) = complex<double>(1/(sqrt(2)));
-  hadamard(1,0) = complex<double>(1/(sqrt(2)));
-  hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
-  
-
-  bool isConstant = true;
-  std::list<qubit> qRegister;
-
-  bool r;
-  qubit qy = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-  qy = applyGate(qy,hadamard);
-
-  for(int i = 0 ; i < nbQubit ; i++){
-     qubit q = qubitFactory(complex<double>(1,0),complex<double>(0,0));
-     qRegister.push_back(q);
-  }
-
-  std::list<qubit>::iterator qIter;
-
-  for(qIter=qRegister.begin();qIter!=qRegister.end();advance(qIter,1)){
-    *qIter = applyGate(*qIter,hadamard);
-  }
-
-  oracleConstantZero(qRegister,qy);
- 
-  for(qIter=qRegister.begin();qIter!=qRegister.end();advance(qIter,1)){
-    *qIter = applyGate(*qIter,hadamard);
-  }
-
-  r = measureQubit(qRegister.front())^measureQubit(qy);
-
-  for(qIter=qRegister.begin();qIter!=qRegister.end();advance(qIter,1)){
-  //  displayFancyMatrix(qIter->state);
-  bool currentXor = measureQubit(*qIter)^measureQubit(qy);
-  cout << " r is " << r << " current measure is " <<  currentXor << endl;
-    if(currentXor!=r){
-      cout << " not constant !" << endl;
-      isConstant = false;
-    }
-  }
-
-  return isConstant;
-}
-
-void oracleConstantZero(list<qubit> qRegister, qubit q){
-  // Comme f(x) = 0 pour toute valeur de x, |y ⊕ f(x)⟩ = |y⟩.
-  // constant -> true;
-
-  matrix<complex<double> > f0 (2,2);
-  f0(0,0)=0;
-  f0(0,1)=0;
-  f0(1,0)=0;
-  f0(1,1)=0;
-  std::list<qubit>::iterator qIter;
-
-  for(qIter=qRegister.begin();qIter!=qRegister.end();advance(qIter,1)){
-    *qIter = applyGate(*qIter,f0); 
-  }
-        
-}
-
 
 
 matrix<complex<double> > applyGateFromMatrix(matrix<complex<double> > state, matrix<complex<double> > gate){
@@ -392,7 +318,6 @@ bool checkOpSize(list<qubit> qubits){
       //   }
       //   cout << endl;
       // }
-
       // cout << endl;
 
        if(qIter->ops.size()!= opSize){valid = false;cerr << "ERROR : opSize is " << qIter->ops.size() << " should be " << opSize << endl; }
