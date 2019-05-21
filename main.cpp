@@ -14,8 +14,8 @@ cout <<" \\____\\__\\_ \\__,_|\\___|_| |_|\\___\\___| " << endl;
 cout << "" << endl;
 cout <<"========================================" << endl;
 
- //deutsch();
- deutschJozsa(4);
+ deutsch();
+ deutschJozsa(3);
  //run(qubits);
 }
 
@@ -78,7 +78,7 @@ void deutschJozsa(int size){
   }
 
   // Build hadamard tensor and identity tensor
-  identityHadamardTensor = tensorProduct(identity,hadamard);
+  identityHadamardTensor = tensorProduct(hadamard,identity);
   for(int k = 2; k < size ; k++){
     identityHadamardTensor = tensorProduct(identityHadamardTensor,hadamard);
   }
@@ -93,6 +93,9 @@ void deutschJozsa(int size){
   cout << "oracleTensor" << endl;
   displayFancyMatrix(oracleTensor);
   cout << endl << endl;
+  cout << "identityHadamardTensor" << endl;
+  displayFancyMatrix(identityHadamardTensor);
+  cout <<endl << endl;
   
   // apply HxI * Uf
   cout << "apply HxI * Uf " << endl;
@@ -140,7 +143,7 @@ void deutsch(){
   hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
   qRegister = tensorProduct(q0.state,q1.state);
   hadamardTensor = tensorProduct(hadamard,hadamard);
-  oracleTensor = tensorProduct(f0,f0);
+  oracleTensor = tensorProduct(identity,identity);
   identityHadamardTensor = tensorProduct(identity,hadamard);
 
   // Some display
@@ -150,6 +153,9 @@ void deutsch(){
   cout <<endl << endl;
   displayFancyMatrix(oracleTensor);
   cout << endl << endl;
+  cout << "identityHadamardTensor" << endl;
+  displayFancyMatrix(identityHadamardTensor);
+  cout <<endl << endl;
   
   // apply HxI * Uf 
   cout << "apply HxI * Uf " << endl;
