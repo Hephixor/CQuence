@@ -15,7 +15,7 @@ cout << "" << endl;
 cout <<"========================================" << endl;
 
  deutsch();
- deutschJozsa(3);
+ //deutschJozsa(3);
  //run(qubits);
 }
 
@@ -35,7 +35,7 @@ void deutschJozsa(int size){
   matrix<complex<double> > qRegisterppp (tensorSize,1);
   matrix<complex<double> > hadamardTensor (tensorSize,tensorSize);
   matrix<complex<double> > oracleTensor (tensorSize,tensorSize);
-  matrix<complex<double> > identityHadamardTensor (tensorSize,tensorSize);
+  matrix<complex<double> > hadamardIdentityTensor (tensorSize,tensorSize);
 
   // Initialize variables
   hadamard(0,0) = complex<double>(1/(sqrt(2)));
@@ -78,9 +78,9 @@ void deutschJozsa(int size){
   }
 
   // Build hadamard tensor and identity tensor
-  identityHadamardTensor = tensorProduct(hadamard,identity);
+  hadamardIdentityTensor = tensorProduct(hadamard,identity);
   for(int k = 2; k < size ; k++){
-    identityHadamardTensor = tensorProduct(identityHadamardTensor,hadamard);
+    hadamardIdentityTensor = tensorProduct(hadamardIdentityTensor,hadamard);
   }
 
   // Some display
@@ -93,13 +93,13 @@ void deutschJozsa(int size){
   cout << "oracleTensor" << endl;
   displayFancyMatrix(oracleTensor);
   cout << endl << endl;
-  cout << "identityHadamardTensor" << endl;
-  displayFancyMatrix(identityHadamardTensor);
+  cout << "hadamardIdentityTensor" << endl;
+  displayFancyMatrix(hadamardIdentityTensor);
   cout <<endl << endl;
   
   // apply HxI * Uf
   cout << "apply HxI * Uf " << endl;
-  qRegisterp =  prod(identityHadamardTensor,oracleTensor);
+  qRegisterp =  prod(hadamardIdentityTensor,oracleTensor);
   displayFancyMatrix(qRegisterp);
   cout <<endl << endl;
   // apply (HxI * Uf) * HxH
@@ -128,7 +128,7 @@ void deutsch(){
   matrix<complex<double> > qRegisterppp (4,1);
   matrix<complex<double> > hadamardTensor (4,4);
   matrix<complex<double> > oracleTensor (4,4);
-  matrix<complex<double> > identityHadamardTensor (4,4);
+  matrix<complex<double> > hadamardIdentityTensor (4,4);
   qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
   qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
 
@@ -136,15 +136,87 @@ void deutsch(){
   f0(0,0)=1;
   f0(0,1)=0;
   f0(1,0)=0;
-  f0(1,1)=1;
+  f0(1,1)=1 ;
   hadamard(0,0) = complex<double>(1/(sqrt(2)));
   hadamard(0,1) = complex<double>(1/(sqrt(2)));
   hadamard(1,0) = complex<double>(1/(sqrt(2)));
   hadamard(1,1) = complex<double>(-(1/(sqrt(2))));
   qRegister = tensorProduct(q0.state,q1.state);
   hadamardTensor = tensorProduct(hadamard,hadamard);
-  oracleTensor = tensorProduct(identity,identity);
-  identityHadamardTensor = tensorProduct(identity,hadamard);
+  
+  displayFancyMatrix(f0);
+
+  int fx0,fx1;
+
+  if(f0.operator()(0,0).real()==1){
+    fx0=0;
+  } 
+  else if(f0.operator()(1,0).real()==1){
+    fx0=1;
+  }
+
+  if(f0.operator()(0,1).real()==1){
+    fx1=0;
+  }
+  else if(f0.operator()(1,1).real()==1){
+    fx1=1;
+  }
+
+  cout << "f(0) = " << fx0 << endl;
+  cout << "f(1) = " << fx1 << endl;
+
+  if((0^fx0)==0){
+    oracleTensor(0,0)=1;
+    oracleTensor(1,0)=0;
+  }
+  else if((0^fx0)==1){
+    oracleTensor(0,0)=0;
+    oracleTensor(1,0)=1;
+  }
+
+  if((1^fx0)==0){
+    oracleTensor(0,1)=1;
+    oracleTensor(1,1)=0;
+  }
+  else if((1^fx0)==1){
+    oracleTensor(0,1)=0;
+    oracleTensor(1,1)=1;
+  }
+
+  
+
+  if((0^fx1)==0){
+    cout <<"(2,2) = 1" << endl;
+    oracleTensor(2,2)=1;
+    oracleTensor(3,2)=0;
+  }
+  else if((0^fx1)==1){
+    cout <<"(2,2) = 0" << endl;
+    oracleTensor(2,2)=0;
+    oracleTensor(3,2)=1;
+  }
+
+  if((1^fx1)==0){
+    oracleTensor(2,3)=1;
+    oracleTensor(3,3)=0;
+  }
+  else if((1^fx1)==1){
+    oracleTensor(2,3)=0;
+    oracleTensor(3,3)=1;
+  }
+
+  // Always 0
+  oracleTensor(0,2)=0;
+  oracleTensor(0,3)=0;
+  oracleTensor(1,2)=0;
+  oracleTensor(1,3)=0;
+  oracleTensor(2,0)=0;
+  oracleTensor(2,1)=0;
+  oracleTensor(3,0)=0;
+  oracleTensor(3,1)=0;
+  
+
+  hadamardIdentityTensor = tensorProduct(hadamard,identity);
 
   // Some display
   displayFancyMatrix(qRegister) ;
@@ -153,13 +225,13 @@ void deutsch(){
   cout <<endl << endl;
   displayFancyMatrix(oracleTensor);
   cout << endl << endl;
-  cout << "identityHadamardTensor" << endl;
-  displayFancyMatrix(identityHadamardTensor);
+  cout << "hadamardIdentityTensor" << endl;
+  displayFancyMatrix(hadamardIdentityTensor);
   cout <<endl << endl;
   
   // apply HxI * Uf 
   cout << "apply HxI * Uf " << endl;
-  qRegisterp =  prod(identityHadamardTensor,oracleTensor);
+  qRegisterp =  prod(hadamardIdentityTensor,oracleTensor);
   displayFancyMatrix(qRegisterp);
   cout <<endl << endl;
   // apply (HxI * Uf) * HxH
@@ -230,7 +302,7 @@ qubit applyGate(qubit q, matrix<complex<double> > gate){
 void displayFancyMatrix(matrix<complex<double> > m){
   for(int i = 0 ; i < m.size1(); i++){
     for(int j = 0 ; j < m.size2(); j++){
-      cout << m.operator()(i,j) << " " ;
+      cout << m.operator()(i,j).real() << " " ;
     }
     cout << "" << endl;
   }
