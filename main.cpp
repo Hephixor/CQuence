@@ -131,6 +131,7 @@ void deutsch(){
   matrix<complex<double> > hadamardIdentityTensor (4,4);
   qubit q0 = qubitFactory(complex<double>(1,0),complex<double>(0,0));
   qubit q1 = qubitFactory(complex<double>(0,0),complex<double>(1,0));
+  int fx0,fx1;
 
   // Initialize variables
   f0(0,0)=1;
@@ -144,10 +145,11 @@ void deutsch(){
   qRegister = tensorProduct(q0.state,q1.state);
   hadamardTensor = tensorProduct(hadamard,hadamard);
   
+  cout << "Characterizing the function with Deutsch. Function : " << endl << endl;;
   displayFancyMatrix(f0);
+  cout << endl << endl;
 
-  int fx0,fx1;
-
+  // Build oracle tensor
   if(f0.operator()(0,0).real()==1){
     fx0=0;
   } 
@@ -162,8 +164,6 @@ void deutsch(){
     fx1=1;
   }
 
-  cout << "f(0) = " << fx0 << endl;
-  cout << "f(1) = " << fx1 << endl;
 
   if((0^fx0)==0){
     oracleTensor(0,0)=1;
@@ -183,15 +183,11 @@ void deutsch(){
     oracleTensor(1,1)=1;
   }
 
-  
-
   if((0^fx1)==0){
-    cout <<"(2,2) = 1" << endl;
     oracleTensor(2,2)=1;
     oracleTensor(3,2)=0;
   }
   else if((0^fx1)==1){
-    cout <<"(2,2) = 0" << endl;
     oracleTensor(2,2)=0;
     oracleTensor(3,2)=1;
   }
@@ -219,36 +215,39 @@ void deutsch(){
   hadamardIdentityTensor = tensorProduct(hadamard,identity);
 
   // Some display
-  displayFancyMatrix(qRegister) ;
-  cout <<endl << endl;
-  displayFancyMatrix(hadamardTensor);
-  cout <<endl << endl;
-  displayFancyMatrix(oracleTensor);
-  cout << endl << endl;
-  cout << "hadamardIdentityTensor" << endl;
-  displayFancyMatrix(hadamardIdentityTensor);
-  cout <<endl << endl;
+  // displayFancyMatrix(qRegister) ;
+  // cout <<endl << endl;
+  // displayFancyMatrix(hadamardTensor);
+  // cout <<endl << endl;
+  // displayFancyMatrix(oracleTensor);
+  // cout << endl << endl;
+  // cout << "hadamardIdentityTensor" << endl;
+  // displayFancyMatrix(hadamardIdentityTensor);
+  // cout <<endl << endl;
   
   // apply HxI * Uf 
-  cout << "apply HxI * Uf " << endl;
+  //cout << "apply HxI * Uf " << endl;
   qRegisterp =  prod(hadamardIdentityTensor,oracleTensor);
-  displayFancyMatrix(qRegisterp);
-  cout <<endl << endl;
+  //displayFancyMatrix(qRegisterp);
+  //cout <<endl << endl;
   // apply (HxI * Uf) * HxH
-  cout << "apply (HxI * Uf) * HxH" << endl;
+  //cout << "apply (HxI * Uf) * HxH" << endl;
   qRegisterpp = prod(qRegisterp,hadamardTensor);
-  displayFancyMatrix(qRegisterpp);
-  cout <<endl << endl;
+  //displayFancyMatrix(qRegisterpp);
+  //cout <<endl << endl;
   // apply ((HxI * Uf) * HxH) * qRegister
-  cout << "apply ((HxI * Uf) * HxH) * qRegister" << endl;
+  cout << "apply ((HxI * Uf) * HxH) * qRegister" << endl << endl;
   qRegisterppp = prod(qRegisterpp,qRegister);
+  cout << "final qRegister state : " <<endl << endl;
   displayFancyMatrix(qRegisterppp);
-  cout <<endl << endl;
+  //cout <<endl << endl;
 
   /* qRegisterppp now contains final intricated qubits quarrying the result of the algo
      We can see that except the tensor initialization, the number of operation needed to
      compute wether f is balanced or constant is the same 
   */
+
+  //TODO measure qRegisterppp
 }
 
 void run(list<qubit> qubits){
@@ -302,7 +301,7 @@ qubit applyGate(qubit q, matrix<complex<double> > gate){
 void displayFancyMatrix(matrix<complex<double> > m){
   for(int i = 0 ; i < m.size1(); i++){
     for(int j = 0 ; j < m.size2(); j++){
-      cout << m.operator()(i,j).real() << " " ;
+        cout << m.operator()(i,j).real() << "\t" ;      
     }
     cout << "" << endl;
   }
